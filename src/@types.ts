@@ -30,5 +30,6 @@ export interface AppContext {
 	chats: any[] | null | undefined;
 	selectedChat: any | null | undefined;
 	setSelectedChatId: Function | null | undefined;
+	sendMessage: Function | null | undefined;
 }
 

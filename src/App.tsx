@@ -15,7 +15,7 @@ const init = async function () {
 	await facebook.initFacebookSDK();
 }
 
-export const appContext = createContext<AppContext>({ showSideBar: true, setShowSideBar: null, toggleSideBar: null, chats: null, selectedChat: null, setSelectedChatId: null })
+export const appContext = createContext<AppContext>({ showSideBar: true, setShowSideBar: null, toggleSideBar: null, chats: null, selectedChat: null, setSelectedChatId: null, sendMessage: null })
 export const facebookCredentialsContext = createContext<FacebookCredentials>({ isLoggedIn: false, logAction: null, toggleLogIn: null })
 
 const App = () => {
@@ -75,12 +75,9 @@ const App = () => {
 				setUserInfo((prev: any) => ({ ...prev, ...response }))
 			})
 
-			// Fetching all the conversations from the page
-			//t_467337325528764
-			// http://graph.facebook.com/8680787735294708/picture?type=square
 			window.FB?.api(`/${process.env.REACT_APP_PAGE_ID}/conversations?access_token=${process.env.REACT_APP_PAGE_SECRET}`,
 				{
-					fields: ['participants']
+					fields: ['participants', 'profile_pic']
 				}
 				, (response: any) => {
 					if (response.error) return
@@ -89,15 +86,14 @@ const App = () => {
 						return response.data.map((chat: any) => {
 							return {
 								username: chat.participants.data[0].name,
-								id: chat.id
+								id: chat.id,
+								userId: chat.participants.data[0].id
 							}
 						})
 					})
 
 				})
-			// window.FB?.api(`/t_467337325528764/messages?access_token=${process.env.REACT_APP_PAGE_SECRET}`, {fields: ['message', 'from', 'picture']}, (response: any) => {
-			// 	console.log('[conversations] ', response)
-			// })
+
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isLoggedIn])
@@ -110,11 +106,12 @@ const App = () => {
 	const setSelectedChatId = (id: string, options: any) => {
 		console.log("[id]", id)
 		window.FB?.api(`/${id}/messages?access_token=${process.env.REACT_APP_PAGE_SECRET}`, { fields: ['message', 'from', 'picture'] }, (response: any) => {
-			console.log('[conversations] ', response.data)
+			console.log('[conversations] ', response)
 			setSelectedChat((prev: any): object => {
 				return {
 					username: options.username,
 					id,
+					userId: options.userId,
 					messages: response.data.map((chat: any) => {
 						return {
 							content: chat.message,
@@ -126,8 +123,18 @@ const App = () => {
 		})
 	}
 
+	const sendMessage = (message: string, options: any) => {
+		console.log({ message, id: options.userId })
+		window.FB?.api(`/me/messages?access_token=${process.env.REACT_APP_PAGE_SECRET}`, 'POST', {
+			recipient: { id: options.userId },
+			message: { text: message }
+		}, (response: any) => {
+			console.log("[sendMessage]", response)
+		})
+	}
+
 	return (
-		<appContext.Provider value={{ showSideBar, setShowSideBar, toggleSideBar, chats, selectedChat, setSelectedChatId }}>
+		<appContext.Provider value={{ showSideBar, setShowSideBar, toggleSideBar, chats, selectedChat, setSelectedChatId, sendMessage }}>
 			<facebookCredentialsContext.Provider value={{ isLoggedIn, logAction, toggleLogIn, userInfo }}>
 				<div className="flex bg-sky-700">
 					<SideBar />

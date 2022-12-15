@@ -5,14 +5,15 @@ import { appContext } from "../App";
 interface ChatCardProps {
     skeleton?: boolean;
     username?: string;
+    userId?: string;
     id?: string | null;
 }
 
-const ChatCard = ({ skeleton = false, username, id = null }: ChatCardProps) => {
+const ChatCard = ({ skeleton = false, username,userId, id = null }: ChatCardProps) => {
     const { setSelectedChatId } = useContext<AppContext>(appContext);
     const onCardClick: MouseEventHandler = () => {
         if (!id) return;
-        setSelectedChatId?.call(null, id, { id, username })
+        setSelectedChatId?.call(null, id, { id, username, userId })
     }
     return (
         <div className="rounded hover:bg-gray-100 h-20 w-full flex items-center px-4 py-2 gap-2 cursor-pointer" title={id ?? ''} onClick={onCardClick}>
