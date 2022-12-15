@@ -10,11 +10,25 @@ const root = ReactDOM.createRoot(
 );
 
 declare let window: WindowExtendedWithFacebook;
+declare let globalThis: WindowExtendedWithFacebook;
+let handler: NodeJS.Timeout;
 
-export const initFacebookSDK = (): Promise<null> => {
-  return new Promise<null>((resolve) => {
-    window.fbAsyncInit = function () {
-      return new Promise<null>(resolve => {
+const waitForFullDownload = () => new Promise<null>(resolve => {
+  handler = setInterval(() => {
+    if (window.FB) {
+      clearInterval(handler)
+      resolve(null)
+    }
+    console.log('Waiting for FB download')
+  }, 100)
+})
+
+const initFacebookSDK = async function (): Promise<null> {
+  return new Promise<null>(async function (resolve) {
+    window.fbAsyncInit = async function () {
+      return new Promise<null>(async resolve => {
+        // await waitForFullDownload();
+        // console.log(globalThis, window.FB)
         window.FB?.init({
           appId: process.env.REACT_APP_FACEBOOK_APP_ID,
           cookie: true,
@@ -48,16 +62,16 @@ export const initFacebookSDK = (): Promise<null> => {
 export const facebook = {
   initialized: false,
   initFacebookSDK,
-  checkLoginStatus: (): Promise<object> => {
+  checkLoginStatus: function (): Promise<object> {
     return new Promise<object>((resolve) => {
-      console.log("[facebook] inside checkLoginStatus", window.FB);
+      console.log("[facebook] inside checkLoginStatus", Object.keys(globalThis));
 
       window.FB?.getLoginStatus(function (response: object) {
         console.log("[facebook] inside getLoginStatus")
         console.log(response)
         resolve(response)
       })
-      
+
     });
   }
 }

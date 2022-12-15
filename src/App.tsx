@@ -4,9 +4,9 @@ import ChatArea from "./components/ChatArea";
 import Chats from "./components/Chats";
 import SideBar from "./components/SideBar";
 import { facebook } from "./index";
-// import { WindowExtendedWithFacebook } from "./@types";
-// 
-// declare let window: WindowExtendedWithFacebook;
+import { WindowExtendedWithFacebook } from "./@types";
+
+declare let window: WindowExtendedWithFacebook;
 
 
 const init = async function () {
@@ -14,7 +14,8 @@ const init = async function () {
 	console.log('[facebook] Initializing...')
 	await facebook.initFacebookSDK();
 	console.log("[facebook] initialized")
-	console.log("[facebook] Checking Status...")
+	// console.log("[facebook] Checking Status...")
+	// await facebook.checkLoginStatus()
 	facebook.initialized = true;
 }
 
@@ -31,6 +32,8 @@ const App = () => {
 	}
 	useEffect(() => {
 		init();
+		console.log("[App] Out of `init()`")
+		console.log("[App]", window.FB)
 	}, [])
 	return (
 		<appContext.Provider value={{ showSideBar, setShowSideBar, toggleSideBar }}>
