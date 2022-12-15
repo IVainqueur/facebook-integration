@@ -1,26 +1,50 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { createContext, useEffect, useState } from "react";
+import { AppContext, FacebookCredentials } from "./@types";
+import ChatArea from "./components/ChatArea";
+import Chats from "./components/Chats";
+import SideBar from "./components/SideBar";
+import { facebook } from "./index";
+// import { WindowExtendedWithFacebook } from "./@types";
+// 
+// declare let window: WindowExtendedWithFacebook;
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+const init = async function () {
+	if (facebook.initialized) return;
+	console.log('[facebook] Initializing...')
+	await facebook.initFacebookSDK();
+	console.log("[facebook] initialized")
+	console.log("[facebook] Checking Status...")
+	facebook.initialized = true;
+}
+
+export const appContext = createContext<AppContext>({ showSideBar: true, setShowSideBar: null, toggleSideBar: null })
+export const facebookCredentialsContext = createContext<FacebookCredentials>({ isLoggedIn: false, logAction: null, toggleLogIn: null })
+
+const App = () => {
+	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
+	const [showSideBar, setShowSideBar] = useState<boolean>(true)
+	const toggleLogIn = () => setIsLoggedIn(!isLoggedIn)
+	const toggleSideBar = () => setShowSideBar(!showSideBar)
+	const logAction = (to: boolean) => {
+		setIsLoggedIn(to);
+	}
+	useEffect(() => {
+		init();
+	}, [])
+	return (
+		<appContext.Provider value={{ showSideBar, setShowSideBar, toggleSideBar }}>
+			<facebookCredentialsContext.Provider value={{ isLoggedIn, logAction, toggleLogIn }}>
+				<div className="flex bg-sky-700">
+					<SideBar />
+					<main className="grow bg-white rounded-l-lg flex ">
+						<Chats />
+						<ChatArea />
+					</main>
+				</div>
+			</facebookCredentialsContext.Provider>
+		</appContext.Provider >
+	);
 }
 
 export default App;
