@@ -65,11 +65,25 @@ const App = () => {
 
 	useEffect(() => {
 		if (isLoggedIn) {
+			// Loading Necessary User Data
 			window.FB?.api(`/me`, { fields: ['name', 'email', 'picture'] }, (response: any) => {
 				console.log("[facebook::api]", response)
 				window.localStorage.setItem('facebookUserInfo', JSON.stringify(response))
 				setUserInfo((prev: any) => ({ ...prev, ...response }))
-				// console.log({ ...userInfo, ...response })
+			})
+
+			// Fetching all the conversations from the page
+			//t_467337325528764
+			// http://graph.facebook.com/8680787735294708/picture?type=square
+			// window.FB?.api(`/${process.env.REACT_APP_PAGE_ID}/conversations?access_token=${process.env.REACT_APP_PAGE_SECRET}`,
+			// {
+			// 	fields: ['messages', 'message', 'from']
+			// }
+			// , (response: any) => {
+			// 	console.log('[conversations] ', response)
+			// })
+			window.FB?.api(`/t_467337325528764/messages?access_token=${process.env.REACT_APP_PAGE_SECRET}`, {fields: ['message', 'from', 'picture']}, (response: any) => {
+				console.log('[conversations] ', response)
 			})
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps

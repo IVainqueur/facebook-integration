@@ -10,8 +10,7 @@ const root = ReactDOM.createRoot(
 );
 
 declare let window: WindowExtendedWithFacebook;
-declare let globalThis: WindowExtendedWithFacebook;
-// let handler: NodeJS.Timeout;
+  // let handler: NodeJS.Timeout;
 
 // const waitForFullDownload = () => new Promise<null>(resolve => {
 //   handler = setInterval(() => {
