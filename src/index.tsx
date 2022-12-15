@@ -11,17 +11,17 @@ const root = ReactDOM.createRoot(
 
 declare let window: WindowExtendedWithFacebook;
 declare let globalThis: WindowExtendedWithFacebook;
-let handler: NodeJS.Timeout;
+// let handler: NodeJS.Timeout;
 
-const waitForFullDownload = () => new Promise<null>(resolve => {
-  handler = setInterval(() => {
-    if (window.FB) {
-      clearInterval(handler)
-      resolve(null)
-    }
-    console.log('Waiting for FB download')
-  }, 100)
-})
+// const waitForFullDownload = () => new Promise<null>(resolve => {
+//   handler = setInterval(() => {
+//     if (window.FB) {
+//       clearInterval(handler)
+//       resolve(null)
+//     }
+//     console.log('Waiting for FB download')
+//   }, 100)
+// })
 
 const initFacebookSDK = async function (): Promise<null> {
   return new Promise<null>(async function (resolve) {
@@ -64,7 +64,7 @@ export const facebook = {
   initFacebookSDK,
   checkLoginStatus: function (): Promise<object> {
     return new Promise<object>((resolve) => {
-      console.log("[facebook] inside checkLoginStatus", Object.keys(globalThis));
+      console.log("[facebook] inside checkLoginStatus");
 
       window.FB?.getLoginStatus(function (response: object) {
         console.log("[facebook] inside getLoginStatus")
@@ -73,6 +73,9 @@ export const facebook = {
       })
 
     });
+  },
+  login: function() {
+    
   }
 }
 

@@ -5,7 +5,10 @@ export interface AppEvents {
 export interface FB {
 	init: Function;
 	AppEvents?: AppEvents;
-    getLoginStatus: Function
+    getLoginStatus: Function;
+	login: Function;
+	logout: Function;
+	api: Function;
 }
 
 export interface WindowExtendedWithFacebook extends Window {
@@ -17,6 +20,7 @@ export interface FacebookCredentials {
 	isLoggedIn: boolean;
 	logAction: Function | null | undefined;
 	toggleLogIn: Function | null | undefined;
+	userInfo?: any;
 }
 
 export interface AppContext {
