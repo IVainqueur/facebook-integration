@@ -5,7 +5,7 @@ import { AppContext } from "../@types"
 import { appContext } from "../App"
 
 const Chats = () => {
-  const { toggleSideBar } = useContext<AppContext>(appContext)
+  const { toggleSideBar, chats } = useContext<AppContext>(appContext)
   return (
     <div className="p-6 rounded-l-lg w-[400px] h-screen border-r-2 border-r-slate-200">
       <div className="flex items-center gap-2 mb-5">
@@ -16,9 +16,23 @@ const Chats = () => {
       </div>
       <div className="ChatCards flex flex-col gap-3">
         {
-          Array(5).fill(null).map((chatChard, i: number) => {
-            return <ChatCard key={`chatCard-${i}`} />
-          })
+          !!chats ?
+            <>
+              {
+                chats.map((chat, i: number) => {
+                  console.log("[chat]", chat)
+                  return <ChatCard {...chat} key={`chatCard-${i}`} />
+                })
+              }
+
+            </> :
+            <>
+              {
+                Array(5).fill(null).map((chat, i: number) => {
+                  return <ChatCard skeleton key={`chatCard-${i}`} />
+                })
+              }
+            </>
         }
       </div>
     </div>

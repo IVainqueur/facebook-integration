@@ -27,4 +27,8 @@ export interface AppContext {
 	showSideBar: boolean;
 	setShowSideBar: Function | null | undefined;
 	toggleSideBar: Function | null | undefined;
+	chats: any[] | null | undefined;
+	selectedChat: any | null | undefined;
+	setSelectedChatId: Function | null | undefined;
 }
+
