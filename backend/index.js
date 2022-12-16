@@ -16,7 +16,14 @@ app.get('/webhook', (req, res) => {
     let mode = req.query["hub.mode"];
     let token = req.query["hub.verify_token"];
     let challenge = req.query["hub.challenge"];
-    res.status(200).send(challenge)
+    console.log("[verification]",{
+        mode, token, challenge
+    })
+    if(token === process.env.VerificationToken){
+        res.status(200).send(challenge)
+    }else {
+        res.status(403).send('You are wrong')
+    }
 })
 
 app.get('*', (req, res) => {
