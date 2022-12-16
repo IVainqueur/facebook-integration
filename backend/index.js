@@ -13,8 +13,10 @@ app.post('/webhook', (req, res) => {
     res.status(200).send("EVENT_RECEIVED");
 })
 app.get('/webhook', (req, res) => {
-    console.log('[hook] verificatino request from', req.hostname);
-    res.status(200).send('EVENT_RECEIVED')
+    let mode = req.query["hub.mode"];
+    let token = req.query["hub.verify_token"];
+    let challenge = req.query["hub.challenge"];
+    res.status(200).send(challenge)
 })
 
 app.get('*', (req, res) => {
