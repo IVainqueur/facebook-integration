@@ -27,6 +27,7 @@ app.get('/webhook', (req, res) => {
 })
 
 app.get('*', (req, res) => {
+    console.log("[unknown route]", req.query)
     res.status(404).json({ code: '#unknown', message: "This particular route could not be found." })
 })
 
