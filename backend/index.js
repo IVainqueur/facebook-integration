@@ -12,6 +12,10 @@ app.post('/webhook', (req, res) => {
     io.sockets.emit('serverEvent', { requestBody: req.body })
     res.status(200).send("EVENT_RECEIVED");
 })
+app.get('/webhook', (req, res) => {
+    console.log('[hook] verificatino request from', req.hostname);
+    res.status(200).send('EVENT_RECEIVED')
+})
 
 app.get('*', (req, res) => {
     res.status(404).json({ code: '#unknown', message: "This particular route could not be found." })
