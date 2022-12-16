@@ -26,6 +26,20 @@ app.get('/webhook', (req, res) => {
     }
 })
 
+app.get('/messaging-webhook', (req, res) => {
+    let mode = req.query["hub.mode"];
+    let token = req.query["hub.verify_token"];
+    let challenge = req.query["hub.challenge"];
+    console.log("[messaging-webhook]", {
+        mode, token, challenge
+    })
+    if (token === process.env.VerificationToken) {
+        res.status(200).send(challenge)
+    } else {
+        res.status(403).send('You are wrong')
+    }
+})
+
 app.get('*', (req, res) => {
     console.log("[unknown route]", req.path, req.query)
     res.status(404).json({ code: '#unknown', message: "This particular route could not be found." })
