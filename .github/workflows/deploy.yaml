@@ -10,13 +10,11 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Remove http.extraheader
-        # run: git config -l | grep 'http\..*\.extraheader' | cut -d= -f1 | xargs -L1 git config --unset-all
         run: git config --unset-all http.https://github.com/.extraheader
 
       - name: push to main branch of facebook_messaging_webhook repo
         uses: cpina/github-action-push-to-another-repository@v1.5.1
         env:
-          # SSH_DEPLOY_KEY: ${{ secrets.SSH_EK_DEPLOYMENT }}
           API_TOKEN_GITHUB: ${{ secrets.CPINO_TOKEN }}
         with:
           source-directory: 'backend'
