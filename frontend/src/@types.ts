@@ -1,11 +1,11 @@
 export interface AppEvents {
-    logPageView: Function;
+	logPageView: Function;
 }
 
 export interface FB {
 	init: Function;
 	AppEvents?: AppEvents;
-    getLoginStatus: Function;
+	getLoginStatus: Function;
 	login: Function;
 	logout: Function;
 	api: Function;
@@ -30,6 +30,6 @@ export interface AppContext {
 	chats: any[] | null | undefined;
 	selectedChat: any | null | undefined;
 	setSelectedChatId: Function | null | undefined;
+	reloadSelectedChat: Function | null | undefined;
 	sendMessage: Function | null | undefined;
 }
-

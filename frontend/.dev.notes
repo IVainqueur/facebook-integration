@@ -1,0 +1,69 @@
+<!-- Facebook SDK cdn link -->
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+<!-- Configuring your app -->
+<script>
+    window.fbAsyncInit = function () {
+        FB.init({
+            appId: 'your-app-id',
+            autoLogAppEvents: true,
+            xfbml: true,
+            version: 'v15.0'
+        });
+    };
+</script>
+
+<!-- Configuration Code -->
+<script>
+    window.fbAsyncInit = function () {
+        FB.init({
+            appId: '{your-app-id}',
+            cookie: true,
+            xfbml: true,
+            version: '{api-version}'
+        });
+
+        FB.AppEvents.logPageView();
+
+    };
+
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {
+            return;
+        }
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+</script>
+
+<!-- Checking connection status -->
+<script>
+    FB.getLoginStatus(function (response) {
+        statusChangeCallback(response);
+    });
+
+    const sampleResponse = {
+        status: 'connected',
+        authResponse: {
+            accessToken: '...',
+            expiresIn: '...',
+            signedRequest: '...',
+            userID: '...'
+        }
+    }
+</script>
+
+<!-- Facebook Login Button -->
+<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+</fb:login-button>
+
+<script>
+    function checkLoginState() {
+        FB.getLoginStatus(function (response) {
+            statusChangeCallback(response);
+        });
+    }
+</script>

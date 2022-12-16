@@ -5,6 +5,9 @@ import Chats from "./components/Chats";
 import SideBar from "./components/SideBar";
 import { facebook } from "./index";
 import { WindowExtendedWithFacebook } from "./@types";
+import { toast } from "./utils/utils";
+import { io } from 'socket.io-client'
+import useSocket from "./utils/useSocket";
 
 declare let window: WindowExtendedWithFacebook;
 
@@ -15,8 +18,24 @@ const init = async function () {
 	await facebook.initFacebookSDK();
 }
 
-export const appContext = createContext<AppContext>({ showSideBar: true, setShowSideBar: null, toggleSideBar: null, chats: null, selectedChat: null, setSelectedChatId: null, sendMessage: null })
-export const facebookCredentialsContext = createContext<FacebookCredentials>({ isLoggedIn: false, logAction: null, toggleLogIn: null })
+export const appContext = createContext<AppContext>({
+	showSideBar: true,
+	setShowSideBar: null,
+	toggleSideBar: null,
+	chats: null,
+	selectedChat: null,
+	setSelectedChatId: null,
+	sendMessage: null,
+	reloadSelectedChat: null
+})
+
+export const facebookCredentialsContext = createContext<FacebookCredentials>({
+	isLoggedIn: false,
+	logAction: null,
+	toggleLogIn: null
+})
+
+const socket = io(process.env.REACT_APP_SOCKET_URI ?? "https://sm-converse.cyclic.app")
 
 const App = () => {
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
@@ -28,37 +47,40 @@ const App = () => {
 	const toggleSideBar = () => setShowSideBar(!showSideBar)
 
 	const logAction = (to: boolean) => {
+		const { hide: hideToast } = toast('loading', `Logging you ${to ? 'in' : 'out'}`, { hideAfter: isLoggedIn ? 1 : 0 })
 		if (to === true) {
 			window.FB?.login(function (response: any) {
-				console.log("[facebook::login] ", response)
 				setIsLoggedIn(response.status === 'connected')
 				window.localStorage.setItem('facebookCredentials', JSON.stringify(response))
 				setUserInfo({ ...userInfo, ...(response.autoResponse ?? {}) })
+				hideToast();
 			}, { scope: 'public_profile,email,user_photos', return_scopes: true })
 		} else {
 			window.FB?.logout(function (response: any) {
-				console.log("[facebook::logout] ", response)
 				setIsLoggedIn(response.status === 'connected')
 				window.localStorage.removeItem('facebookCredentials')
 				window.localStorage.removeItem('facebookUserInfo')
+				window.location.reload()
 			})
 		}
 
 	}
+	useSocket(socket);
 	useEffect(() => {
 		init();
-		console.log("[App] Out of `init()`")
-		console.log("[App]", window.FB)
 		let handler: NodeJS.Timeout;
 		handler = setInterval(async () => {
-			if (facebook.initialized) clearInterval(handler)
+			if (facebook.initialized) {
+				clearInterval(handler)
+				return;
+			}
 			if (!!window.FB) {
 				console.log("[facebook] initialized")
 				facebook.initialized = true;
 				clearInterval(handler)
 				const loginStatus: any = await facebook.checkLoginStatus();
 				if (loginStatus.status !== 'connected') {
-					alert("You are not logged in. Please login!")
+					toast('error', 'You are not logged in! Please login.', { hideAfter: 3 })
 				} else {
 					setIsLoggedIn(true)
 				}
@@ -70,7 +92,6 @@ const App = () => {
 		if (isLoggedIn) {
 			// Loading Necessary User Data
 			window.FB?.api(`/me`, { fields: ['name', 'email', 'picture'] }, (response: any) => {
-				console.log("[facebook::api]", response)
 				window.localStorage.setItem('facebookUserInfo', JSON.stringify(response))
 				setUserInfo((prev: any) => ({ ...prev, ...response }))
 			})
@@ -81,7 +102,7 @@ const App = () => {
 				}
 				, (response: any) => {
 					if (response.error) return
-					console.log('[conversations] ', response.data)
+					// console.log('[conversations] ', response.data)
 					setChats(prev => {
 						return response.data.map((chat: any) => {
 							return {
@@ -100,13 +121,12 @@ const App = () => {
 
 	useEffect(() => {
 		console.log("[userInfo]", userInfo)
-		console.log(`https://graph.facebook.com/${userInfo.id}/picture?type=normal`)
 	}, [userInfo])
 
 	const setSelectedChatId = (id: string, options: any) => {
-		console.log("[id]", id)
+		const { hide: hideToast } = toast('loading', `Opening chats with ${options.username}`)
 		window.FB?.api(`/${id}/messages?access_token=${process.env.REACT_APP_PAGE_SECRET}`, { fields: ['message', 'from', 'picture'] }, (response: any) => {
-			console.log('[conversations] ', response)
+			hideToast();
 			setSelectedChat((prev: any): object => {
 				return {
 					username: options.username,
@@ -124,7 +144,6 @@ const App = () => {
 	}
 
 	const sendMessage = (message: string, options: any) => {
-		console.log({ message, id: options.userId })
 		window.FB?.api(`/me/messages?access_token=${process.env.REACT_APP_PAGE_SECRET}`, 'POST', {
 			recipient: { id: options.userId },
 			message: { text: message }
@@ -132,9 +151,11 @@ const App = () => {
 			console.log("[sendMessage]", response)
 		})
 	}
-
+	const reloadSelectedChat = () => {
+		console.log('[reloadSelectedChat] reloading...')
+	}
 	return (
-		<appContext.Provider value={{ showSideBar, setShowSideBar, toggleSideBar, chats, selectedChat, setSelectedChatId, sendMessage }}>
+		<appContext.Provider value={{ showSideBar, setShowSideBar, toggleSideBar, chats, selectedChat, setSelectedChatId, sendMessage, reloadSelectedChat }}>
 			<facebookCredentialsContext.Provider value={{ isLoggedIn, logAction, toggleLogIn, userInfo }}>
 				<div className="flex bg-sky-700">
 					<SideBar />

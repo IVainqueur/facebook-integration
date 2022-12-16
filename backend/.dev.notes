@@ -1,0 +1,18 @@
+<!-- webhook request body sample -->
+<script>
+    const requestBodySample = {
+        "object": "page",
+        "entry": [{
+            "id": "<PAGE_ID>",
+            "time": 1458692752478,
+            "messaging": [{
+                "sender": {
+                    "id": "<PSID>"
+                },
+                "recipient": {
+                    "id": "<PAGE_ID>"
+                },
+            }]
+        }]
+    }
+</script>
